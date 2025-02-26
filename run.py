@@ -8,10 +8,11 @@ import asyncio.streams
 from pathlib import Path
 from app.HTTPRequest import HTTPRequest
 from app.HTTPResponse import HTTPResponse
+from typing import Dict
 
 CONFIG_PATH = 'app/config.toml'
 
-def load_config(file_path: str) -> dict:
+def load_config(file_path: str) -> Dict[str, str]:
     if not Path(file_path).is_file():
         raise FileNotFoundError(f"Config file '{file_path}' not found.")
 
@@ -31,7 +32,7 @@ parser.add_argument('--recipient', required=True, help='Номер получа�
 parser.add_argument('--message', required=True, help='Текст сообщения')
 args = parser.parse_args()
 
-async def send_sms(config, sender, recipient, message):
+async def send_sms(config: Dict[str, str], sender: str, recipient: str, message: str) -> None:
     url = config['service_url'].replace('http://', '')
     host, port = url.split(':')
     port = int(port) if port else 80
@@ -82,7 +83,7 @@ async def send_sms(config, sender, recipient, message):
     writer.close()
     await writer.wait_closed()
 
-async def main():
+async def main() -> None:
     config = load_config(CONFIG_PATH)
     await send_sms(config, args.sender, args.recipient, args.message)
 

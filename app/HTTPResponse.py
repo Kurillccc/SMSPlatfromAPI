@@ -1,7 +1,8 @@
-# Класс для парсинга HTTP-ответа
+from typing import Dict, Optional, Type
 
+# Класс для парсинга HTTP-ответа
 class HTTPResponse:
-    def __init__(self, status_code, headers=None, body=None):
+    def __init__(self, status_code: int, headers: Optional[Dict[str, str]] = None, body: Optional[bytes] = None):
         self.status_code = status_code
         self.headers = headers or {}
         self.body = body or b""
@@ -12,7 +13,7 @@ class HTTPResponse:
         return (status_line + headers + "\r\n\r\n").encode() + self.body
 
     @classmethod
-    def from_bytes(cls, binary_data: bytes):
+    def from_bytes(cls: Type['HTTPResponse'], binary_data: bytes) -> 'HTTPResponse':
         lines = binary_data.split(b"\r\n")
         status_line = lines[0].decode().split()
         status_code = int(status_line[1])
