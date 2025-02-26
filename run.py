@@ -14,12 +14,15 @@ CONFIG_PATH = 'app/config.toml'
 def load_config(file_path: str) -> dict:
     if not Path(file_path).is_file():
         raise FileNotFoundError(f"Config file '{file_path}' not found.")
+
     with open(file_path, 'rb') as f:
         config = tomli.load(f)
+
     required_keys = ['service_url', 'username', 'password']
     for key in required_keys:
         if key not in config:
             raise ValueError(f"Missing required config key: {key}")
+
     return config
 
 parser = argparse.ArgumentParser(description='Отправка СМС')
@@ -56,15 +59,25 @@ async def send_sms(config, sender, recipient, message):
     await writer.drain()
 
     response_data = await reader.read()
-    print("Ответ сервера (в виде байтов):")
+    print("\nОтвет сервера (в виде байтов):")
     print(response_data)
 
     # Парсим ответ с HTTPResponse
     response = HTTPResponse.from_bytes(response_data)
-    print("\nОтвет сервера (парсинг):")
-    print("Код ответа:", response.status_code)
-    print("Заголовки:", response.headers)
-    print("Тело ответа:", response.body.decode())
+    if response.status_code == 200:
+        print("\nОтвет сервера (парсинг):")
+        print("Код ответа:", response.status_code)
+        print("Тело ответа:", response.body.decode())
+        print("Заголовки:", response.headers)
+    elif response.status_code == 400:
+        print("Код ответа:", response.status_code)
+        print("Invalid parameters")
+    elif response.status_code == 401:
+        print("Код ответа:", response.status_code)
+        print("Invalid credentials")
+    elif response.status_code == 500:
+        print("Код ответа:", response.status_code)
+        print("Internal server error")
 
     writer.close()
     await writer.wait_closed()
