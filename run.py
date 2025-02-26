@@ -1,15 +1,16 @@
-import asyncio
-import tomli
 import argparse
+import asyncio
+import asyncio.streams
 import base64
 import json
-import asyncio.streams
 import logging
-
 from pathlib import Path
+from typing import Dict
+
+import tomli
+
 from app.HTTPRequest import HTTPRequest
 from app.HTTPResponse import HTTPResponse
-from typing import Dict
 
 CONFIG_PATH = 'app/config.toml'
 
